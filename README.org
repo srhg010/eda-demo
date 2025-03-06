@@ -3,6 +3,10 @@
 #+email: srhg.0.1.0@gmail.com
 
 * TODO Análisis de los discursos de los presidentes.
+#+caption: Análisis PCA.
+#+name: text_analysis_figure_01
+[[./src/eda_demo/text_analysis_figures/figure_01.png]]
+
 ** IDEA Concomitar un UMAP al PCA
 * TODO Exploración del panorama de viviendas de San Francisco.
 ** Prolegomena
