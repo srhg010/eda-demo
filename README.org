@@ -86,6 +86,37 @@
 - El precio por pie cuadrado disminuye de manera no lineal en función del tamaño de la construcción, con las construcción más pequeñas costando más por pie cuadrado y las construcciónes más grandes tienendo un costo por pie cuadrado más constante.
 - Los lugares más deseables añaden un incremento al precio de venta más o menos constante sin importar el tamaño de la construcción.
 * TODO Predicción del peso de los burritos.
+
+#+caption:
+#+name: eda_donkeys_figure_01
+[[./src/eda_demo/eda_donkeys_figures/figure_01.png]]
+#+caption:
+#+name: eda_donkeys_figure_02
+[[./src/eda_demo/eda_donkeys_figures/figure_02.png]]
+#+caption:
+#+name: eda_donkeys_figure_03
+[[./src/eda_demo/eda_donkeys_figures/figure_03.png]]
+#+caption:
+#+name: eda_donkeys_figure_04
+[[./src/eda_demo/eda_donkeys_figures/figure_04.png]]
+#+caption:
+#+name: eda_donkeys_figure_05
+[[./src/eda_demo/eda_donkeys_figures/figure_05.png]]
+#+caption:
+#+name: eda_donkeys_figure_06
+[[./src/eda_demo/eda_donkeys_figures/figure_06.png]]
+#+caption:
+#+name: eda_donkeys_figure_08
+[[./src/eda_demo/eda_donkeys_figures/figure_08.png]]
+#+caption:
+#+name: eda_donkeys_figure_09
+[[./src/eda_demo/eda_donkeys_figures/figure_09.png]]
+#+caption:
+#+name: eda_donkeys_figure_10
+[[./src/eda_demo/eda_donkeys_figures/figure_10.png]]
+#+caption:
+#+name: eda_donkeys_figure_11
+[[./src/eda_demo/eda_donkeys_figures/figure_11.png]]
 * TODO Calibración de los medidores de la calidad del aire.
 ** TODO Gráficas
 * TODO rcParams
