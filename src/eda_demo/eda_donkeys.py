@@ -1,37 +1,31 @@
-from itertools import combinations
-from pathlib import Path
-from typing import Any, Callable
+from eda_demo import (
+    combinations,
+    Path,
+    Any,
+    Callable,
+    mpl,
+    plt,
+    np,
+    pd,
+    sns,
+    Axes,
+    Figure,
+    GridSpec,
+    NDArray,
+    minimize,
+    # paths
+    DONKEYS_PATH,
+)
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import seaborn as sns
-from matplotlib.axes import Axes
-from matplotlib.figure import Figure
-from matplotlib.gridspec import GridSpec
-from numpy.typing import NDArray
-from scipy.optimize import minimize
-
-plt.style.use("seaborn-v0_8-darkgrid")
-mpl.rcParams["figure.facecolor"] = "e6e6e6"
-mpl.rcParams["axes.facecolor"] = "e6e6e6"
-
-# supported linestyles:
-# '-', '--', '-.', ':', 'None', ' ', '', 'solid', 'dashed', 'dashdot', 'dotted'
-
-# paths
-datasets_path = Path("/home/zerserob/Documents/Projects/Python/datasets")
-donkeys_path = datasets_path / "donkeys.csv"
 
 # examine the first few rows
 first_few_lines = []
 if not first_few_lines:
-    with donkeys_path.open() as f:
+    with DONKEYS_PATH.open() as f:
         for _ in range(5):
             first_few_lines.append(f.readline())
 
-donkeys = pd.read_csv(donkeys_path)
+donkeys = pd.read_csv(DONKEYS_PATH)
 donkeys_cb_path = {
     "BCS": {
         "Data type": "float64",
@@ -121,7 +115,7 @@ def _combine_age_and_sex(X: pd.DataFrame) -> pd.DataFrame:
 # quality checks on the data
 # quality of the measurements and their distributions
 def _df_01() -> tuple[pd.DataFrame, Any, Any]:
-    donkeys = pd.read_csv(donkeys_path)
+    donkeys = pd.read_csv(DONKEYS_PATH)
     donkeys = donkeys.assign(
         difference=donkeys.loc[:, "WeightAlt"] - donkeys.loc[:, "Weight"]
     )
@@ -140,14 +134,14 @@ def _figure_01(df: pd.DataFrame) -> tuple[Figure, Axes]:
     bins = 15
     x_label = "Diferencias de peso (kg)"
     y_label = "Conteo"
-    suptitle = """31 burros fueron pesados dos veces para tener
+    ax_title = """31 burros fueron pesados dos veces para tener
     una medida de la consistencia de las básculas."""
     fig, ax = plt.subplots(figsize=figsize, layout="constrained")
     ax.hist(x=x, bins=bins, label="bins=15", alpha=0.8)
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
     ax.legend()
-    fig.suptitle(suptitle)
+    ax.set_title(ax_title)
     return fig, ax
 
 
@@ -158,7 +152,7 @@ def figure_01() -> tuple[Figure, Axes]:
 
 
 def _df_02() -> pd.DataFrame:
-    df_02 = pd.read_csv(donkeys_path).pipe(_remove_bcs_outliers)
+    df_02 = pd.read_csv(DONKEYS_PATH).pipe(_remove_bcs_outliers)
     return df_02
 
 
@@ -167,7 +161,7 @@ def _figure_02(
     col: str = "Weight",
     x_label: str = "Peso (kg)",
     y_label: str = "Conteo",
-    suptitle: str = "Distribución del peso de los burros",
+    ax_title: str = "Distribución del peso de los burros",
     bins: int = 40,
     figsize: tuple[int, int] = (11, 6),
 ) -> tuple[Figure, Axes]:
@@ -177,7 +171,7 @@ def _figure_02(
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
     ax.legend()
-    fig.suptitle(suptitle)
+    ax.set_title(ax_title)
     return fig, ax
 
 
@@ -206,7 +200,7 @@ def _figure_03(
     ax.scatter(x=x, y=y, alpha=0.5)
     ax.set_ylabel("Peso (kg)")
     ax.set_xlabel("Altura (cm)")
-    fig.suptitle("Gráfico de dispersión: altura vs peso")
+    ax.set_title("Gráfico de dispersión: altura vs peso")
     return fig, ax
 
 
@@ -220,7 +214,7 @@ def figure_03():
 def _df_04() -> tuple[pd.DataFrame, pd.DataFrame]:
     """Train set"""
     donkeys = (
-        pd.read_csv(donkeys_path)
+        pd.read_csv(DONKEYS_PATH)
         .pipe(_remove_bcs_outliers)
         .pipe(_remove_weight_outliers)
     )
@@ -653,7 +647,7 @@ def _figure_11(x: pd.Series, y: pd.Series):
     ax.set_xlabel("Peso predicho (kg)")
     ax.set_ylabel("Peso real (kg)")
     ax.legend()
-    fig.suptitle("Predicción de peso en el conjunto de prueba.")
+    ax.set_title("Predicción de peso en el conjunto de prueba.")
     return fig, ax
 
 
@@ -664,26 +658,35 @@ def figure_11():
 
 
 figs = {
-    # "figure_01": figure_01,
-    # "figure_02": figure_02,
-    # "figure_03": figure_03,
-    # "figure_04": figure_04,
+    "figure_01": figure_01,
+    "figure_02": figure_02,
+    "figure_03": figure_03,
+    "figure_04": figure_04,
     "figure_05": figure_05,
-    # "figure_06": figure_06,
-    # "figure_08": figure_08,
-    # "figure_09": figure_09,
-    # "figure_10": figure_10,
-    # "figure_11": figure_11,
+    "figure_06": figure_06,
+    "figure_07": figure_07,
+    "figure_08": figure_08,
+    "figure_09": figure_09,
+    "figure_10": figure_10,
+    "figure_11": figure_11,
 }
 
-figs_dirpath = Path(".").resolve() / "eda_donkeys_figures"
+figs_dirpath = Path(".").resolve() / "eda_donkeys_figures_2"
 figs_dirpath.mkdir(exist_ok=True)
 fl = list(figs.keys())
 
 for i, func_name in enumerate(fl):
     fig, _ = figs[func_name]()
+    fig.suptitle(
+        f"Modelo de predicción de peso\nGráfica {func_name.split("_")[1]} de 11"
+    )
+    print(f"Generando gráfica {func_name}")
+
+    # plt.show()
+
     save_path = figs_dirpath.name + "/" + func_name + ".png"
     fig.savefig(save_path, dpi=300)
+    plt.close()
     print(f"\nSe guardó la imagen {func_name}.\n", end="\u2a69" * (1 + i) + "\n")
     print(f"Quedan {len(fl)- 1 - i}")
 

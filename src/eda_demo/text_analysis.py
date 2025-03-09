@@ -1,39 +1,32 @@
-import re
-from pathlib import Path
-from typing import Any, Dict, Union
-
-import matplotlib as mpl
-import matplotlib.colors as mcolors
-import matplotlib.pyplot as plt
-import nltk
-import numpy as np
-import pandas as pd
-from matplotlib.axes import Axes
-from matplotlib.collections import PathCollection
-from matplotlib.colorbar import Colorbar
-from matplotlib.figure import Figure
-from nltk.stem.porter import PorterStemmer
-from numpy.typing import NDArray
-from scipy.sparse.linalg import svds
-from sklearn.feature_extraction.text import TfidfVectorizer
-
-# algunas especificaciones para el estilo de las gráficas
-plt.style.use("seaborn-v0_8-darkgrid")
-mpl.rcParams["figure.facecolor"] = "e6e6e6"
-mpl.rcParams["axes.facecolor"] = "e6e6e6"
+from eda_demo import (
+    TEXT_PATH,
+    Any,
+    Axes,
+    Colorbar,
+    Dict,
+    Figure,
+    NDArray,
+    Path,
+    PathCollection,
+    PorterStemmer,
+    TfidfVectorizer,
+    Union,
+    mcolors,
+    mpl,
+    nltk,
+    np,
+    pd,
+    plt,
+    re,
+    svds,
+)
+from scipy.sparse import csr_matrix, spmatrix
 
 # un diccionario para mostrar mensajes
 messages: dict[int, str] = {}
 
-# paths
-datasets_path = Path("/home/zerserob/Documents/Projects/Python/datasets/")
-# debería añadir los de 2023 y 2024 (the end of the woke era)
-# text_path = datasets_path / "stateoftheunion1790-2022.txt"
-text_alt_path = datasets_path / "stateoftheunion1790-2025.txt"
-text_path = text_alt_path
-
 # leer el documento
-text: str = text_path.read_text()
+text: str = TEXT_PATH.read_text()
 
 # crear un regex para contar el número de discursos
 num_speeches: int = len(re.findall(pattern=r"\*\*\*", string=text))
@@ -72,28 +65,44 @@ def _clean_text(df: pd.DataFrame) -> pd.DataFrame:
     return df.assign(text=cleaned)
 
 
-df = read_speeches(records).pipe(_clean_text)
+def _speech_vectors() -> tuple[pd.DataFrame, csr_matrix | spmatrix | NDArray]:
+    """
+    Returns:
+        scipy.sparse.csr_matrix: Sparse matrix de vectores TF-IDF.
+            Shape: (232, 13211)
+            Cada fila representa un discurso.
+            Cada columna representa un token.
+    """
+    import warnings
 
-# stop words
-# conjugación de verbos
-stop_words = set(nltk.corpus.stopwords.words("english"))
-porter_stemmer = PorterStemmer()
+    df = read_speeches(records).pipe(_clean_text)
+
+    # stop words
+    # conjugación de verbos
+    stop_words = set(nltk.corpus.stopwords.words("english"))
+    porter_stemmer = PorterStemmer()
+
+    def stemming_tokenizer(document: str) -> list[str]:
+        return [
+            porter_stemmer.stem(word)
+            for word in nltk.word_tokenize(document)
+            if word not in stop_words
+        ]
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="The parameter 'token_pattern' will not be used "
+            + "since 'tokenizer' is not None",
+            category=UserWarning,
+        )
+        tfidf = TfidfVectorizer(tokenizer=stemming_tokenizer)
+        speech_vectors: csr_matrix | spmatrix | NDArray = tfidf.fit_transform(
+            raw_documents=df.loc[:, "text"], y=None
+        )  # type: ignore
+        return df, speech_vectors
 
 
-def stemming_tokenizer(document: str) -> list[str]:
-    return [
-        porter_stemmer.stem(word)
-        for word in nltk.word_tokenize(document)
-        if word not in stop_words
-    ]
-
-
-tfidf = TfidfVectorizer(tokenizer=stemming_tokenizer)
-# type(speech_vectors)
-# <class 'scipy.sparse._csr.csr_matrix'>
-# speech_vectors.shape
-# (232, 13211)
-speech_vectors = tfidf.fit_transform(df.loc[:, "text"])
 messages[1] = "Son 232 discursos. Se transformaron en vectores de 13,211 palabras."
 
 
@@ -106,6 +115,8 @@ def compute_pcs(data: NDArray, *, k: int | None = None) -> NDArray:
     U, s, _ = svds(centered, k=k)  # type: ignore
     return U @ np.diag(s)
 
+
+df, speech_vectors = _speech_vectors()
 
 pcs = compute_pcs(speech_vectors, k=2)  # type: ignore
 # esto "ajusta" las componentes para que la figura
@@ -174,7 +185,8 @@ annotation_points = create_annotation_points(df_pcas)
 annotations = extract_annotations(annotation_points)
 
 
-def create_pca_plot(df: pd.DataFrame) -> tuple[Figure, Axes]:
+def create_pca_plot(df: pd.DataFrame = df_pcas) -> tuple[Figure, Axes]:
+    # df = df_pcas
     years: NDArray = df.loc[:, "year"].values
     pc1: NDArray = df.loc[:, "pc1"].values
     pc2: NDArray = df.loc[:, "pc2"].values
@@ -221,27 +233,55 @@ def create_pca_plot(df: pd.DataFrame) -> tuple[Figure, Axes]:
         )
 
     fig.legend(loc="outside right upper")
-    plt.show()
     return fig, ax
 
 
-feature_names = tfidf.get_feature_names_out()
+# feature_names = tfidf.get_feature_names_out()
 
-components = svds(speech_vectors - speech_vectors.mean(axis=0), k=2)[2]
+# components = svds(speech_vectors - speech_vectors.mean(axis=0), k=2)[2]
 
-for i, component in enumerate(components):
-    sorted_indices = np.argsort(np.abs(component))[::-1][:10]
-    top_words = [(feature_names[idx], component[idx]) for idx in sorted_indices]
-    print(f"PC{i+1} top words:")
-    for word, weight in top_words:
-        print(f"  {word}: {weight:.4f}")
-
-
-def save_plot(fig: Figure, fname: str) -> None:
-    fig.savefig(fname=fname, dpi=400, format="png", bbox_inches="tight")
-    print("Se ha guardado la figura al ordenador.")
-    return None
+# for i, component in enumerate(components):
+#     sorted_indices = np.argsort(np.abs(component))[::-1][:10]
+#     top_words = [(feature_names[idx], component[idx]) for idx in sorted_indices]
+#     print(f"PC{i+1} top words:")
+#     for word, weight in top_words:
+#         print(f"  {word}: {weight:.4f}")
 
 
-fig, _ = create_pca_plot(df_pcas)
-save_plot(fig, "text_analysis_figures/figure_01.png")
+# def save_plot(fig: Figure, fname: str) -> None:
+#     fig.savefig(fname=fname, dpi=400, format="png", bbox_inches="tight")
+#     print("Se ha guardado la figura al ordenador.")
+#     return None
+
+
+# fig, _ = create_pca_plot(df_pcas)
+# save_plot(fig, "text_analysis_figures/figure_01.png")
+
+figure_01 = create_pca_plot
+figs = {
+    "figure_01": figure_01,
+}
+
+figs_dirpath = Path(".").resolve() / "text_analysis_figures_02"
+figs_dirpath.mkdir(exist_ok=True)
+fl = list(figs.keys())
+
+for i, func_name in enumerate(fl):
+    try:
+        fig, _ = figs[func_name]()
+        fig.suptitle(
+            f"Exploración del mercado de viviendas de SF\nGráfica {func_name.split("_")[1]} de 10"
+        )
+        print(f"Generando gráfica {func_name}")
+
+        # plt.show()
+
+        save_path = figs_dirpath.name + "/" + func_name + ".png"
+        fig.savefig(save_path, dpi=300)
+        plt.close()
+        print(f"\nSe guardó la imagen {func_name}.\n", end="\u2a69" * (1 + i) + "\n")
+        print(f"Quedan {len(fl)- 1 - i}")
+    except NameError:
+        print(f"Todavía no está lista {func_name}")
+
+print("Se guardaron todas las imágenes.")

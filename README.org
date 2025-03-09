@@ -2,13 +2,13 @@
 #+author: Sergio Roberto
 #+email: srhg.0.1.0@gmail.com
 
-* TODO Análisis de los discursos de los presidentes.
+* Análisis de los discursos de los presidentes.
 #+caption: Análisis PCA.
 #+name: text_analysis_figure_01
 [[./src/eda_demo/text_analysis_figures/figure_01.png]]
 
-** IDEA Concomitar un UMAP al PCA
-* TODO Exploración del panorama de viviendas de San Francisco.
+** Concomitar un UMAP al PCA
+* Exploración del panorama de viviendas de San Francisco.
 ** Prolegomena
 - Los datos fueron recopilados (/scraped/) del San Francisco Chronicle [[https://www.sfchronicle.com/realestate/][Complete real estate coverage of the SF Bay Area]]
 - Los datos son una lista de casas vendidas en el área de abril de 2003 a diciembre de 2008.
@@ -85,7 +85,7 @@
 - El precio de venta y el tamaño de la construcción están sesgados hacia la derecha con una única moda.
 - El precio por pie cuadrado disminuye de manera no lineal en función del tamaño de la construcción, con las construcción más pequeñas costando más por pie cuadrado y las construcciónes más grandes tienendo un costo por pie cuadrado más constante.
 - Los lugares más deseables añaden un incremento al precio de venta más o menos constante sin importar el tamaño de la construcción.
-* TODO Predicción del peso de los burritos.
+* Predicción del peso de los burritos.
 
 #+caption:
 #+name: eda_donkeys_figure_01
@@ -117,9 +117,49 @@
 #+caption:
 #+name: eda_donkeys_figure_11
 [[./src/eda_demo/eda_donkeys_figures/figure_11.png]]
-* TODO Calibración de los medidores de la calidad del aire.
-** TODO Gráficas
-* TODO rcParams
+* Calibración de los medidores de la calidad del aire.
+
+#+caption:
+#+name:
+[[./src/eda_demo/air_model_figures/figure_01.png]]
+#+caption:
+#+name:
+[[./src/eda_demo/air_model_figures/figure_02.png]]
+#+caption:
+#+name:
+[[./src/eda_demo/air_model_figures/figure_03.png]]
+#+caption:
+#+name:
+[[./src/eda_demo/air_model_figures/figure_04.png]]
+#+caption:
+#+name:
+[[./src/eda_demo/air_model_figures/figure_05.png]]
+#+caption:
+#+name:
+[[./src/eda_demo/air_model_figures/figure_06.png]]
+#+caption:
+#+name:
+[[./src/eda_demo/air_model_figures/figure_07.png]]
+#+caption:
+#+name:
+[[./src/eda_demo/air_model_figures/figure_10.png]]
+#+caption:
+#+name:
+[[./src/eda_demo/air_model_figures/figure_11.png]]
+#+caption:
+#+name:
+[[./src/eda_demo/air_model_figures/figure_12.png]]
+#+caption:
+#+name:
+[[./src/eda_demo/air_model_figures/figure_13.png]]
+#+caption:
+#+name:
+[[./src/eda_demo/air_model_figures/figure_14.png]]
+#+caption:
+#+name:
+[[./src/eda_demo/air_model_figures/figure_15.png]]
+
+* rcParams
 
 * Footnotes
 [fn:2] Explicar qué es la granularidad.

@@ -1,26 +1,22 @@
-from pathlib import Path
-from typing import Any, Final
-
-from scipy import stats
-from pandas.compat.pickle_compat import patch_pickle
-from statsmodels.nonparametric.smoothers_lowess import lowess
-import seaborn as sns
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-from matplotlib.ticker import EngFormatter
-import numpy as np
-import pandas as pd
-from matplotlib.axes import Axes
-from matplotlib.figure import Figure
-from numpy.typing import NDArray
-
-plt.style.use("seaborn-v0_8-darkgrid")
-mpl.rcParams["figure.facecolor"] = "e6e6e6"
-mpl.rcParams["axes.facecolor"] = "e6e6e6"
-
-# paths
-datasets_path: Final[Path] = Path("/home/zerserob/Documents/Projects/Python/datasets")
-sfh_path: Final[Path] = datasets_path / "sfhousing.csv"
+from eda_demo import (
+    Path,
+    Any,
+    Final,
+    stats,
+    patch_pickle,
+    lowess,
+    sns,
+    mpl,
+    plt,
+    EngFormatter,
+    np,
+    pd,
+    Axes,
+    Figure,
+    NDArray,
+    # paths
+    SFH_PATH,
+)
 
 
 # csv -> DataFrame
@@ -31,12 +27,12 @@ def _parse_dates_and_years(df: pd.DataFrame) -> pd.DataFrame:
     return df.assign(timestamp=dates)
 
 
-def _df_1() -> pd.DataFrame:
+def _df_01() -> pd.DataFrame:
     usecols = pd.Index(
         ["city", "zip", "street", "price", "br", "lsqft", "bsqft", "date"]
     )
     sfh_df: pd.DataFrame = pd.read_csv(
-        sfh_path, on_bad_lines="skip", usecols=usecols, low_memory=False
+        SFH_PATH, on_bad_lines="skip", usecols=usecols, low_memory=False
     )
     sfh_df["price"] = pd.to_numeric(sfh_df.loc[:, "price"], errors="coerce")
     sfh_df = sfh_df.dropna(subset="price")
@@ -76,13 +72,13 @@ def inspect_percentile(
     )
 
 
-def _figure_1(df: pd.DataFrame) -> tuple[Figure, list[Axes]]:
-    under_4m = df[df["price"] < 4_000_000].copy()
-    under_4m["log_price"] = np.log10(under_4m["price"])
+def _figure_01(df: pd.DataFrame) -> tuple[Figure, list[Axes]]:
+    under_04m = df[df["price"] < 4_000_000].copy()
+    under_04m["log_price"] = np.log10(under_04m["price"])
     fig: Figure
     axes: list[Axes]
     fig, axes = plt.subplots(1, 2, figsize=(12, 7), layout="constrained", sharey=True)
-    axes[0].hist(under_4m["price"], bins=50, label="Una venta en ese rango de precio")
+    axes[0].hist(under_04m["price"], bins=50, label="Una venta en ese rango de precio")
     axes[0].legend()
     axes[0].set_title("Precio como tal")
     axes[0].set_ylabel("Conteo")
@@ -90,7 +86,7 @@ def _figure_1(df: pd.DataFrame) -> tuple[Figure, list[Axes]]:
     formatter = EngFormatter(places=1, sep="")
     axes[0].xaxis.set_major_formatter(formatter)
     axes[1].hist(
-        under_4m["log_price"], bins=50, label="Una venta en ese rango transformado"
+        under_04m["log_price"], bins=50, label="Una venta en ese rango transformado"
     )
     axes[1].legend()
     axes[1].set_title("Precio con transformación log10")
@@ -99,12 +95,12 @@ def _figure_1(df: pd.DataFrame) -> tuple[Figure, list[Axes]]:
     return fig, axes
 
 
-def figure_1() -> tuple[Figure, list[Axes]]:
+def figure_01() -> tuple[Figure, list[Axes]]:
     """Muestra dos histogramas yuxtapuestos de los precios de venta. En
     el izquierdo se muestran los precios "como tal" y en el derecho se
     muestran con una transformación log10."""
-    df_1 = _df_1()
-    fig, axes = _figure_1(df_1)
+    df_01 = _df_01()
+    fig, axes = _figure_01(df_01)
     return fig, axes
 
 
@@ -118,14 +114,14 @@ def _subset(df: pd.DataFrame) -> pd.DataFrame:
     return df.loc[bm_price & bm_bsqft & bm_timestamp]
 
 
-def _df_2() -> pd.DataFrame:
+def _df_02() -> pd.DataFrame:
     """Añade la columna `log_bsqft`."""
-    df_1 = _df_1()
-    df_2 = df_1.pipe(_subset).assign(log_bsqft=np.log10(df_1["bsqft"]))
-    return df_2
+    df_01 = _df_01()
+    df_02 = df_01.pipe(_subset).assign(log_bsqft=np.log10(df_01["bsqft"]))
+    return df_02
 
 
-def _figure_2(df: pd.DataFrame) -> tuple[Figure, list[Axes]]:
+def _figure_02(df: pd.DataFrame) -> tuple[Figure, list[Axes]]:
     fig: Figure
     axes: list[Axes]
     fig, axes = plt.subplots(1, 2, figsize=(12, 7), layout="constrained", sharey=True)
@@ -145,20 +141,20 @@ def _figure_2(df: pd.DataFrame) -> tuple[Figure, list[Axes]]:
     return fig, axes
 
 
-def figure_2() -> tuple[Figure, list[Axes]]:
-    df_2 = _df_2()
-    fig, axes = _figure_2(df_2)
+def figure_02() -> tuple[Figure, list[Axes]]:
+    df_02 = _df_02()
+    fig, axes = _figure_02(df_02)
     return fig, axes
 
 
-def _df_3() -> pd.DataFrame:
+def _df_03() -> pd.DataFrame:
     """Añade la columna `log_lsqft`."""
-    df_2 = _df_2()
-    df_3 = df_2.assign(log_lsqft=np.log10(df_2["lsqft"]))
-    return df_3
+    df_02 = _df_02()
+    df_03 = df_02.assign(log_lsqft=np.log10(df_02["lsqft"]))
+    return df_03
 
 
-def _figure_3(df: pd.DataFrame) -> tuple[Figure, list[Axes]]:
+def _figure_03(df: pd.DataFrame) -> tuple[Figure, list[Axes]]:
     fig: Figure
     axes: list[Axes]
     fig, axes = plt.subplots(1, 2, figsize=(12, 7), layout="constrained")
@@ -187,19 +183,19 @@ def _figure_3(df: pd.DataFrame) -> tuple[Figure, list[Axes]]:
     return fig, axes
 
 
-def figure_3() -> tuple[Figure, list[Axes]]:
-    df_3 = _df_3()
-    fig, axes = _figure_3(df_3)
+def figure_03() -> tuple[Figure, list[Axes]]:
+    df_03 = _df_03()
+    fig, axes = _figure_03(df_03)
     return fig, axes
 
 
-def _df_4() -> pd.DataFrame:
-    df_3 = _df_3()
-    df_4 = df_3.copy()
-    return df_4
+def _df_04() -> pd.DataFrame:
+    df_03 = _df_03()
+    df_04 = df_03.copy()
+    return df_04
 
 
-def _figure_4(df: pd.DataFrame) -> tuple[Figure, Axes]:
+def _figure_04(df: pd.DataFrame) -> tuple[Figure, Axes]:
     br_cat = df["br"].value_counts().reset_index()
     fig: Figure
     ax: Axes
@@ -215,22 +211,22 @@ def _figure_4(df: pd.DataFrame) -> tuple[Figure, Axes]:
     return fig, ax
 
 
-def figure_4() -> tuple[Figure, Axes]:
-    df_4 = _df_4()
-    fig, ax = _figure_4(df_4)
+def figure_04() -> tuple[Figure, Axes]:
+    df_04 = _df_04()
+    fig, ax = _figure_04(df_04)
     return fig, ax
 
 
 # número de cuartos -> característica ordinal (orden)
-def _df_5() -> pd.DataFrame:
-    df_4 = _df_4()
-    df_5 = df_4.copy()
-    eight_up = df_5.loc[df_5["br"] >= 8, "br"].unique()
-    df_5["new_br"] = df_5["br"].replace(eight_up, 8)
-    return df_5
+def _df_05() -> pd.DataFrame:
+    df_04 = _df_04()
+    df_05 = df_04.copy()
+    eight_up = df_05.loc[df_05["br"] >= 8, "br"].unique()
+    df_05["new_br"] = df_05["br"].replace(eight_up, 8)
+    return df_05
 
 
-def _figure_5(df: pd.DataFrame) -> tuple[Figure, Axes]:
+def _figure_05(df: pd.DataFrame) -> tuple[Figure, Axes]:
     br_cat = df["new_br"].value_counts().reset_index()
     fig: Figure
     ax: Axes
@@ -258,9 +254,9 @@ def _figure_5(df: pd.DataFrame) -> tuple[Figure, Axes]:
     return fig, ax
 
 
-def figure_5() -> tuple[Figure, Axes]:
-    df_5 = _df_5()
-    fig, ax = _figure_5(df_5)
+def figure_05() -> tuple[Figure, Axes]:
+    df_05 = _df_05()
+    fig, ax = _figure_05(df_05)
     return fig, ax
 
 
@@ -280,14 +276,14 @@ def _clip_br(df: pd.DataFrame) -> pd.DataFrame:
     return df.assign(new_br=new_br)
 
 
-def _df_6() -> pd.DataFrame:
-    df_5 = _df_5()
-    df_6 = df_5.pipe(_subset).pipe(_log_vals).pipe(_clip_br)
-    return df_6
+def _df_06() -> pd.DataFrame:
+    df_05 = _df_05()
+    df_06 = df_05.pipe(_subset).pipe(_log_vals).pipe(_clip_br)
+    return df_06
 
 
 # relación entre el número de habitaciones y el precio
-def _figure_6(df: pd.DataFrame) -> tuple[Figure, Axes]:
+def _figure_06(df: pd.DataFrame) -> tuple[Figure, Axes]:
     """
          Q1-1.5IQR   Q1   median  Q3   Q3+1.5IQR
                       |-----:-----|
@@ -314,7 +310,7 @@ def _figure_6(df: pd.DataFrame) -> tuple[Figure, Axes]:
             "markersize": 4,
         }
     }
-    ax.boxplot(x=boxplot_data, tick_labels=boxplot_ticks, patch_artist=True, **boxprops)
+    ax.boxplot(x=boxplot_data, tick_labels=boxplot_ticks, patch_artist=True, **boxprops)  # type: ignore
     ax.set_ylabel("Precio (USD)")
     ax.set_xlabel("Número de cuartos")
     formatter = EngFormatter(places=1, sep="")
@@ -323,67 +319,29 @@ def _figure_6(df: pd.DataFrame) -> tuple[Figure, Axes]:
     return fig, ax
 
 
-def figure_6() -> tuple[Figure, Axes]:
+def figure_06() -> tuple[Figure, Axes]:
     """Muestra boxplots del precio de las casas divididos por grupos pertenecientes
     al número de cuartos."""
-    df_6 = _df_6()
-    fig, ax = _figure_6(df_6)
+    df_06 = _df_06()
+    fig, ax = _figure_06(df_06)
     return fig, ax
 
 
-def _df_7() -> pd.DataFrame:
-    df_6 = _df_6()
-    df_7 = df_6.copy()
-    return df_7
+def _df_07() -> pd.DataFrame:
+    df_06 = _df_06()
+    df_07 = df_06.copy()
+    return df_07
 
 
-# def _figure_7(
-#     data: pd.DataFrame,
-#     x_col: str,
-#     y_col: str,
-#     log_y: bool = False,
-#     width: float = 8.0 * 1.4,
-#     height: float = 8.0,
-#     x_label: str | None = None,
-#     y_label: str | None = None,
-# ) -> tuple[Figure, Axes]:
-#     figsize = (width, height)
-#     fig, ax = plt.subplots(figsize=figsize, layout="constrained")
-#     new_br = data["new_br"]
-
-#     grouped_data = [
-#         data[data[x_col] == val].loc[:, y_col].dropna().values
-#         for val in sorted(data[x_col].unique())
-#     ]
-
-#     ax.boxplot(grouped_data)
-#     ax.set_xticklabels(sorted(data[x_col].unique()))
-#     if log_y:
-#         ax.set_yscale("log")
-#     ax.set_xlabel(x_label if x_label else x_col)
-#     ax.set_ylabel(y_label if y_label else y_col)
-#     return fig, ax
-
-
-# def figure_7() -> None:
-#     """Esto es escoria."""
-#     df_7 = _df_7()
-#     x_col = "bsqft"
-#     y_col = "price"
-#     fig, ax = _figure_7(df_7, x_col, y_col)
-#     plt.show()
-#     return None
-
-
-def _df_8() -> pd.DataFrame:
-    df_7 = _df_7()
-    df_8 = df_7.assign(
-        ppsf=df_7["price"] / df_7["bsqft"], log_ppsf=lambda df: np.log10(df["ppsf"])
+def _df_08() -> pd.DataFrame:
+    df_07 = _df_07()
+    df_08 = df_07.assign(
+        ppsf=df_07["price"] / df_07["bsqft"], log_ppsf=lambda df: np.log10(df["ppsf"])
     )
-    return df_8
+    return df_08
 
 
-def _figure_8(df: pd.DataFrame) -> tuple[Figure, tuple[Any, Any]]:
+def _figure_08(df: pd.DataFrame) -> tuple[Figure, tuple[Any, Any]]:
     color1 = sns.color_palette()[1]
     color2 = sns.color_palette()[2]
 
@@ -431,9 +389,9 @@ def _figure_8(df: pd.DataFrame) -> tuple[Figure, tuple[Any, Any]]:
     return fig, (ax1, ax2)
 
 
-def figure_8() -> tuple[Figure, tuple[Any, Any]]:
-    df_8 = _df_8()
-    fig, (ax1, ax2) = _figure_8(df_8)
+def figure_08() -> tuple[Figure, tuple[Any, Any]]:
+    df_08 = _df_08()
+    fig, (ax1, ax2) = _figure_08(df_08)
     return fig, (ax1, ax2)
 
 
@@ -456,20 +414,20 @@ def _make_lamorinda(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def _df_9() -> pd.DataFrame:
-    df_1 = _df_1()
-    df_9 = (
-        df_1.pipe(_subset)
+def _df_09() -> pd.DataFrame:
+    df_01 = _df_01()
+    df_09 = (
+        df_01.pipe(_subset)
         .pipe(_log_vals)
         .pipe(_clip_br)
         .pipe(_compute_ppsf)
         .pipe(_make_lamorinda)
     )
-    return df_9
+    return df_09
 
 
 # distribution of sale price for these cities
-def _figure_9(df: pd.DataFrame) -> tuple[Figure, Axes]:
+def _figure_09(df: pd.DataFrame) -> tuple[Figure, Axes]:
     cities = [
         "Richmond",
         "El Cerrito",
@@ -487,7 +445,7 @@ def _figure_9(df: pd.DataFrame) -> tuple[Figure, Axes]:
     boxplot_data = []
     for city in cities:
         city_data = query[query["city"] == city]
-        price_values = city_data["price"].values
+        price_values = city_data.loc[:, "price"].values
         boxplot_data.append(price_values)
     boxprops = {
         "flierprops": {
@@ -499,7 +457,7 @@ def _figure_9(df: pd.DataFrame) -> tuple[Figure, Axes]:
         }
     }
 
-    ax.boxplot(boxplot_data, patch_artist=True, **boxprops)
+    ax.boxplot(boxplot_data, patch_artist=True, **boxprops)  # type: ignore
     formatter = EngFormatter(places=1, sep="")
     ax.set_xticklabels(cities)
     ax.set_yscale("log")
@@ -509,15 +467,15 @@ def _figure_9(df: pd.DataFrame) -> tuple[Figure, Axes]:
     return fig, ax
 
 
-def figure_9() -> tuple[Figure, Axes]:
-    df_9 = _df_9()
-    fig, ax = _figure_9(df_9)
+def figure_09() -> tuple[Figure, Axes]:
+    df_09 = _df_09()
+    fig, ax = _figure_09(df_09)
     return fig, ax
 
 
 def _df_10() -> pd.DataFrame:
-    df_9 = _df_9()
-    df_10 = df_9.copy()
+    df_09 = _df_09()
+    df_10 = df_09.copy()
     return df_10
 
 
@@ -569,13 +527,13 @@ def figure_10() -> tuple[Figure, Any]:
 
 # figs = {
 #     "figure_1": figure_1,
-#     "figure_2": figure_2,
-#     "figure_3": figure_3,
-#     "figure_4": figure_4,
-#     "figure_5": figure_5,
-#     "figure_6": figure_6,
-#     "figure_8": figure_8,
-#     "figure_9": figure_9,
+#     "figure_02": figure_02,
+#     "figure_03": figure_03,
+#     "figure_04": figure_04,
+#     "figure_05": figure_05,
+#     "figure_06": figure_06,
+#     "figure_08": figure_08,
+#     "figure_09": figure_09,
 #     "figure_10": figure_10,
 # }
 
@@ -591,3 +549,40 @@ def figure_10() -> tuple[Figure, Any]:
 #     print(f"Quedan {len(fl)- 1 - i}")
 
 # print("Se guardaron todas las imágenes.")
+
+figs = {
+    "figure_01": figure_01,
+    "figure_02": figure_02,
+    "figure_03": figure_03,
+    "figure_04": figure_04,
+    "figure_05": figure_05,
+    "figure_06": figure_06,
+    # "figure_07": figure_07,
+    "figure_08": figure_08,
+    "figure_09": figure_09,
+    "figure_10": figure_10,
+}
+
+figs_dirpath = Path(".").resolve() / "sf_housing_figures_02"
+figs_dirpath.mkdir(exist_ok=True)
+fl = list(figs.keys())
+
+for i, func_name in enumerate(fl):
+    try:
+        fig, _ = figs[func_name]()
+        fig.suptitle(
+            f"Exploración del mercado de viviendas de SF\nGráfica {func_name.split("_")[1]} de 10"
+        )
+        print(f"Generando gráfica {func_name}")
+
+        # plt.show()
+
+        save_path = figs_dirpath.name + "/" + func_name + ".png"
+        fig.savefig(save_path, dpi=300)
+        plt.close()
+        print(f"\nSe guardó la imagen {func_name}.\n", end="\u2a69" * (1 + i) + "\n")
+        print(f"Quedan {len(fl)- 1 - i}")
+    except NameError:
+        print(f"Todavía no está lista {func_name}")
+
+print("Se guardaron todas las imágenes.")
