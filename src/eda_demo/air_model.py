@@ -1,4 +1,3 @@
-# Import everything needed from the package's __init__.py
 from eda_demo import (
     # Standard libraries
     json,
