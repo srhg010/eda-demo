@@ -1,33 +1,27 @@
 from eda_demo import (
-    # Standard libraries
-    json,
-    Path,
-    Any,
-    Sequence,
-    # External libraries
-    mpl,
-    mdates,
-    plt,
-    np,
-    pd,
-    sqlalchemy,
-    stats,
-    LinearRegression,
-    lowess,
-    # Types
-    Axes,
-    Figure,
-    NDArray,
-    DataFrame,
-    Series,
-    # Paths
-    CLEANED24_PATH,
     AQSSITES_PATH,
+    CLEANED24_PATH,
+    PA_CSVS,
     PASENSORS_PATH,
     SACRAMSENSOR_PATH,
-    AMTSTESTINGADIR_PATH,
-    PA_CSVS,
-    PACOTY_PATH,
+    Any,
+    Axes,
+    DataFrame,
+    Figure,
+    LinearRegression,
+    NDArray,
+    Path,
+    Sequence,
+    Series,
+    json,
+    lowess,
+    mdates,
+    mpl,
+    np,
+    pd,
+    plt,
+    sqlalchemy,
+    stats,
 )
 
 # plt.style.use("seaborn-v0_8-darkgrid")
@@ -493,9 +487,9 @@ def _df_07() -> pd.DataFrame:
 def _figure_07(df: pd.DataFrame) -> tuple[Figure, Axes]:
     fig, ax = plt.subplots(figsize=(6 * 1.4, 6), layout="constrained")
     ax.hist(df, bins="doane")
-    ax.set_title("Distribution of difference between the two readings")
-    ax.set_ylabel("This should be percent")
-    ax.set_xlabel(r"Difference: PA-AQS reading")
+    ax.set_title("Distribución de las diferencias de medición entre PA y AQS")
+    ax.set_ylabel("Conteo")
+    ax.set_xlabel(r"Diferencia entre las lecturas de los sensores de PA y AQS")
     return fig, ax
 
 
@@ -503,12 +497,6 @@ def figure_07() -> tuple[Figure, Axes]:
     df_07 = _df_07()
     fig, ax = _figure_07(df_07)
     return fig, ax
-
-
-def _df_x07() -> pd.DataFrame:
-    full_df = _full_df()
-    df_07 = full_df.loc[(full_df["pm25aqs"] < 50)]
-    return df_07
 
 
 def _df_10() -> pd.DataFrame:
@@ -590,7 +578,7 @@ def _figure_11(
     )
     ax.scatter(data.loc[:, x_col], data.loc[:, y_col], alpha=0.5)
     ax.axhline(0.0, linestyle="dashed", alpha=0.7)
-    ax.set_xlabel("Prediction")
+    ax.set_xlabel("Predicción")
     ax.set_ylabel("Error")
     return fig, ax
 
@@ -658,7 +646,7 @@ def _figure_12(
     ax.scatter(x=x_srs, y=y_srs, alpha=0.5)
     ax.axhline(0.0, linestyle="dashed", alpha=0.7)
     ax.set_ylabel("Error")
-    ax.set_xlabel("Date")
+    ax.set_xlabel("Fecha")
     return fig, ax
 
 
@@ -755,6 +743,9 @@ def _figure_14(
 def figure_14() -> tuple[Figure, Axes]:
     df_14 = _df_14()
     fig, axs = _figure_14(df_14)
+    axs[0, 0].set_ylabel("PurpleAir")
+    axs[2, 0].set_ylabel("Humedad")
+    axs[2, 2].set_ylabel("Humedad")
     return fig, axs
 
 
@@ -823,44 +814,44 @@ def figure_15() -> tuple[Figure, Axes]:
 #     fig, ax = uf_object()
 #     plt.show()
 
-figs = {
-    "figure_01": figure_01,
-    "figure_02": figure_02,
-    "figure_03": figure_03,
-    "figure_04": figure_04,
-    "figure_05": figure_05,
-    "figure_06": figure_06,
-    "figure_07": figure_07,
-    # "figure_08": figure_08,
-    # "figure_09": figure_09,
-    "figure_10": figure_10,
-    "figure_11": figure_11,
-    "figure_12": figure_12,
-    "figure_13": figure_13,
-    "figure_14": figure_14,
-    "figure_15": figure_15,
-}
+# figs = {
+#     "figure_01": figure_01,
+#     "figure_02": figure_02,
+#     "figure_03": figure_03,
+#     "figure_04": figure_04,
+#     "figure_05": figure_05,
+#     "figure_06": figure_06,
+#     "figure_07": figure_07,
+#     # "figure_08": figure_08,
+#     # "figure_09": figure_09,
+#     "figure_10": figure_10,
+#     "figure_11": figure_11,
+#     "figure_12": figure_12,
+#     "figure_13": figure_13,
+#     "figure_14": figure_14,
+#     "figure_15": figure_15,
+# }
 
-figs_dirpath = Path(".").resolve() / "air_model_figures_2"
-figs_dirpath.mkdir(exist_ok=True)
-fl = list(figs.keys())
+# figs_dirpath = Path(".").resolve() / "air_model_figures_2"
+# figs_dirpath.mkdir(exist_ok=True)
+# fl = list(figs.keys())
 
-for i, func_name in enumerate(fl):
-    try:
-        fig, _ = figs[func_name]()
-        fig.suptitle(
-            f"Modelo de calibración de sensores\nGráfica {func_name.split("_")[1]} de 15"
-        )
-        print(f"Generando gráfica {func_name}")
+# for i, func_name in enumerate(fl):
+#     try:
+#         fig, _ = figs[func_name]()
+#         fig.suptitle(
+#             f"Modelo de calibración de sensores\nGráfica {func_name.split("_")[1]} de 15"
+#         )
+#         print(f"Generando gráfica {func_name}")
 
-        # plt.show()
+#         # plt.show()
 
-        save_path = figs_dirpath.name + "/" + func_name + ".png"
-        fig.savefig(save_path, dpi=300)
-        plt.close()
-        print(f"\nSe guardó la imagen {func_name}.\n", end="\u2a69" * (1 + i) + "\n")
-        print(f"Quedan {len(fl)- 1 - i}")
-    except NameError:
-        print(f"Todavía no está lista {func_name}")
+#         save_path = figs_dirpath.name + "/" + func_name + ".png"
+#         fig.savefig(save_path, dpi=300)
+#         plt.close()
+#         print(f"\nSe guardó la imagen {func_name}.\n", end="\u2a69" * (1 + i) + "\n")
+#         print(f"Quedan {len(fl)- 1 - i}")
+#     except NameError:
+#         print(f"Todavía no está lista {func_name}")
 
-print("Se guardaron todas las imágenes.")
+# print("Se guardaron todas las imágenes.")

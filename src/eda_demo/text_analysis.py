@@ -270,7 +270,7 @@ for i, func_name in enumerate(fl):
     try:
         fig, _ = figs[func_name]()
         fig.suptitle(
-            f"Exploración del mercado de viviendas de SF\nGráfica {func_name.split("_")[1]} de 10"
+            f"Discursos de los presidentes de USofA dados frente al SOTU\nGráfica {func_name.split("_")[1]} de 1"
         )
         print(f"Generando gráfica {func_name}")
 
