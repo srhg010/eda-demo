@@ -257,31 +257,39 @@ def create_pca_plot(df: pd.DataFrame = df_pcas) -> tuple[Figure, Axes]:
 # fig, _ = create_pca_plot(df_pcas)
 # save_plot(fig, "text_analysis_figures/figure_01.png")
 
-figure_01 = create_pca_plot
-figs = {
-    "figure_01": figure_01,
-}
 
-figs_dirpath = Path(".").resolve() / "text_analysis_figures_02"
-figs_dirpath.mkdir(exist_ok=True)
-fl = list(figs.keys())
+def main():
+    figure_01 = create_pca_plot
+    figs = {
+        "figure_01": figure_01,
+    }
 
-for i, func_name in enumerate(fl):
-    try:
-        fig, _ = figs[func_name]()
-        fig.suptitle(
-            f"Discursos de los presidentes de USofA dados frente al SOTU\nGráfica {func_name.split("_")[1]} de 1"
-        )
-        print(f"Generando gráfica {func_name}")
+    figs_dirpath = Path(__file__).parent / "text_analysis_figures"
+    figs_dirpath.mkdir(exist_ok=True)
+    fl = list(figs.keys())
 
-        # plt.show()
+    for i, func_name in enumerate(fl):
+        try:
+            fig, _ = figs[func_name]()
+            fig.suptitle(
+                f"Discursos de los presidentes de USofA dados frente al SOTU\nGráfica {func_name.split("_")[1]} de 1"
+            )
+            print(f"Generando gráfica {func_name}")
 
-        save_path = figs_dirpath.name + "/" + func_name + ".png"
-        fig.savefig(save_path, dpi=300)
-        plt.close()
-        print(f"\nSe guardó la imagen {func_name}.\n", end="\u2a69" * (1 + i) + "\n")
-        print(f"Quedan {len(fl)- 1 - i}")
-    except NameError:
-        print(f"Todavía no está lista {func_name}")
+            # plt.show()
 
-print("Se guardaron todas las imágenes.")
+            save_path = figs_dirpath / f"{func_name}.png"
+            fig.savefig(save_path, dpi=300, format="png")
+            plt.close()
+            print(
+                f"\nSe guardó la imagen {func_name}.\n", end="\u2a69" * (1 + i) + "\n"
+            )
+            print(f"Quedan {len(fl)- 1 - i}")
+        except NameError:
+            print(f"Todavía no está lista {func_name}")
+
+    print("Se guardaron todas las imágenes.")
+
+
+if __name__ == "__main__":
+    main()

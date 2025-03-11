@@ -550,39 +550,47 @@ def figure_10() -> tuple[Figure, Any]:
 
 # print("Se guardaron todas las imágenes.")
 
-figs = {
-    "figure_01": figure_01,
-    "figure_02": figure_02,
-    "figure_03": figure_03,
-    "figure_04": figure_04,
-    "figure_05": figure_05,
-    "figure_06": figure_06,
-    # "figure_07": figure_07,
-    "figure_08": figure_08,
-    "figure_09": figure_09,
-    "figure_10": figure_10,
-}
 
-figs_dirpath = Path(".").resolve() / "sf_housing_figures_02"
-figs_dirpath.mkdir(exist_ok=True)
-fl = list(figs.keys())
+def main():
+    figs = {
+        "figure_01": figure_01,
+        "figure_02": figure_02,
+        "figure_03": figure_03,
+        "figure_04": figure_04,
+        "figure_05": figure_05,
+        "figure_06": figure_06,
+        # "figure_07": figure_07,
+        "figure_08": figure_08,
+        "figure_09": figure_09,
+        "figure_10": figure_10,
+    }
 
-for i, func_name in enumerate(fl):
-    try:
-        fig, _ = figs[func_name]()
-        fig.suptitle(
-            f"Exploración del mercado de viviendas de SF\nGráfica {func_name.split("_")[1]} de 10"
-        )
-        print(f"Generando gráfica {func_name}")
+    figs_dirpath = Path(__file__).parent / "sf_housing_figures"
+    figs_dirpath.mkdir(exist_ok=True)
+    fl = list(figs.keys())
 
-        # plt.show()
+    for i, func_name in enumerate(fl):
+        try:
+            fig, _ = figs[func_name]()
+            fig.suptitle(
+                f"Exploración del mercado de viviendas de SF\nGráfica {func_name.split("_")[1]} de 10"
+            )
+            print(f"Generando gráfica {func_name}")
 
-        save_path = figs_dirpath.name + "/" + func_name + ".png"
-        fig.savefig(save_path, dpi=300)
-        plt.close()
-        print(f"\nSe guardó la imagen {func_name}.\n", end="\u2a69" * (1 + i) + "\n")
-        print(f"Quedan {len(fl)- 1 - i}")
-    except NameError:
-        print(f"Todavía no está lista {func_name}")
+            # plt.show()
 
-print("Se guardaron todas las imágenes.")
+            save_path = figs_dirpath / f"{func_name}.png"
+            fig.savefig(save_path, dpi=300, format="png")
+            plt.close()
+            print(
+                f"\nSe guardó la imagen {func_name}.\n", end="\u2a69" * (1 + i) + "\n"
+            )
+            print(f"Quedan {len(fl)- 1 - i}")
+        except NameError:
+            print(f"Todavía no está lista {func_name}")
+
+    print("Se guardaron todas las imágenes.")
+
+
+if __name__ == "__main__":
+    main()

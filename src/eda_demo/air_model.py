@@ -731,21 +731,47 @@ def _figure_14(
                     alpha=0.5,
                     s=20,
                 )
-                if i == len(columns) - 1:
-                    axs[i, j].set_xlabel(labels.get(col2, col2))
-                if j == 0:
-                    axs[i, j].set_ylabel(labels.get(col1, col1))
-            else:
-                axs[i, j].set_visible(False)
+    axs[0, 0].set_ylabel("PurpleAir")
+    for spine in axs[0, 0].spines.values():
+        spine.set_visible(False)
+    axs[0, 0].tick_params(
+        axis="both",
+        which="both",
+        bottom=False,
+        top=False,
+        left=False,
+        right=False,
+        labelbottom=False,
+        labelleft=False,
+    )
+    axs[0, 0].grid(False)
+    axs[0, 0].yaxis.label.set_visible(True)
+    axs[1, 0].set_ylabel("AQS")
+    axs[1, 1].set_visible(False)
+    axs[2, 0].set_ylabel("Humedad")
+    axs[2, 0].set_xlabel("PurpleAir")
+    axs[2, 1].set_xlabel("AQS")
+    axs[2, 2].set_xlabel("Humedad")
+    for spine in axs[2, 2].spines.values():
+        spine.set_visible(False)
+    axs[2, 2].tick_params(
+        axis="both",
+        which="both",
+        bottom=False,
+        top=False,
+        left=False,
+        right=False,
+        labelbottom=False,
+        labelleft=False,
+    )
+    axs[2, 2].grid(False)
+    axs[2, 2].yaxis.label.set_visible(True)
     return fig, axs
 
 
 def figure_14() -> tuple[Figure, Axes]:
     df_14 = _df_14()
     fig, axs = _figure_14(df_14)
-    axs[0, 0].set_ylabel("PurpleAir")
-    axs[2, 0].set_ylabel("Humedad")
-    axs[2, 2].set_ylabel("Humedad")
     return fig, axs
 
 
@@ -771,7 +797,7 @@ def _figure_15(
     error_values: np.ndarray,
     error_threshold: float = 4.0,
     y_range: tuple[float, float] = (-12, 12),
-    figsize: tuple[float, float] = (10.5, 5.5),
+    figsize: tuple[float, float] = (10.5, 8.5),
 ) -> tuple[Figure, Axes]:
     """Dispersión de error vs valores predichos."""
     fig, ax = plt.subplots(figsize=figsize)
@@ -782,11 +808,11 @@ def _figure_15(
         [error_threshold, error_threshold],
         alpha=0.1,
         color="green",
-        label=f"±{error_threshold} error range",
+        label=f"±{error_threshold} de rango de error",
     )
     ax.scatter(predicted_values, error_values, alpha=0.5)
     ax.axhline(y=0, linestyle="--", linewidth=3, color="black", alpha=1.0)
-    ax.set_xlabel("Predicted PurpleAir measurement")
+    ax.set_xlabel("Valores predichos para PurpleAir")
     ax.set_ylabel("Error")
     ax.set_ylim(y_range)
     ax.legend()
@@ -814,44 +840,52 @@ def figure_15() -> tuple[Figure, Axes]:
 #     fig, ax = uf_object()
 #     plt.show()
 
-# figs = {
-#     "figure_01": figure_01,
-#     "figure_02": figure_02,
-#     "figure_03": figure_03,
-#     "figure_04": figure_04,
-#     "figure_05": figure_05,
-#     "figure_06": figure_06,
-#     "figure_07": figure_07,
-#     # "figure_08": figure_08,
-#     # "figure_09": figure_09,
-#     "figure_10": figure_10,
-#     "figure_11": figure_11,
-#     "figure_12": figure_12,
-#     "figure_13": figure_13,
-#     "figure_14": figure_14,
-#     "figure_15": figure_15,
-# }
 
-# figs_dirpath = Path(".").resolve() / "air_model_figures_2"
-# figs_dirpath.mkdir(exist_ok=True)
-# fl = list(figs.keys())
+def main():
+    figs = {
+        "figure_01": figure_01,
+        "figure_02": figure_02,
+        "figure_03": figure_03,
+        "figure_04": figure_04,
+        "figure_05": figure_05,
+        "figure_06": figure_06,
+        "figure_07": figure_07,
+        # "figure_08": figure_08,
+        # "figure_09": figure_09,
+        "figure_10": figure_10,
+        "figure_11": figure_11,
+        "figure_12": figure_12,
+        "figure_13": figure_13,
+        "figure_14": figure_14,
+        "figure_15": figure_15,
+    }
 
-# for i, func_name in enumerate(fl):
-#     try:
-#         fig, _ = figs[func_name]()
-#         fig.suptitle(
-#             f"Modelo de calibración de sensores\nGráfica {func_name.split("_")[1]} de 15"
-#         )
-#         print(f"Generando gráfica {func_name}")
+    figs_dirpath = Path(__file__).parent / "air_model_figures"
+    figs_dirpath.mkdir(exist_ok=True)
+    fl = list(figs.keys())
 
-#         # plt.show()
+    for i, func_name in enumerate(fl):
+        try:
+            fig, _ = figs[func_name]()
+            fig.suptitle(
+                f"Modelo de calibración de sensores\nGráfica {func_name.split("_")[1]} de 15"
+            )
+            print(f"Generando gráfica {func_name}")
 
-#         save_path = figs_dirpath.name + "/" + func_name + ".png"
-#         fig.savefig(save_path, dpi=300)
-#         plt.close()
-#         print(f"\nSe guardó la imagen {func_name}.\n", end="\u2a69" * (1 + i) + "\n")
-#         print(f"Quedan {len(fl)- 1 - i}")
-#     except NameError:
-#         print(f"Todavía no está lista {func_name}")
+            # plt.show()
 
-# print("Se guardaron todas las imágenes.")
+            save_path = figs_dirpath / f"{func_name}.png"
+            fig.savefig(save_path, dpi=300, format="png")
+            plt.close()
+            print(
+                f"\nSe guardó la imagen {func_name}.\n", end="\u2a69" * (1 + i) + "\n"
+            )
+            print(f"Quedan {len(fl)- 1 - i}")
+        except NameError:
+            print(f"Todavía no está lista {func_name}")
+
+    print("Se guardaron todas las imágenes.")
+
+
+if __name__ == "__main__":
+    main()

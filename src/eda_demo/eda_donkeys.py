@@ -296,7 +296,7 @@ def _figure_05(train_set: Any) -> tuple[Figure, Axes]:
             s=30,
         )
     ax.set_xlabel("Body condition score")
-    ax.set_ylabel("Weight (kg)")
+    ax.set_ylabel("Peso (kg)")
     return fig, ax
 
 
@@ -311,7 +311,6 @@ def figure_05() -> tuple[Figure, Axes]:
 # categorical (age, sex, body, body condition) ~ weight
 
 
-# examine the quantitative variables
 def _df_06() -> pd.DataFrame:
     df_05 = _df_05()
     df_06 = df_05.loc[:, ["Weight", "Length", "Girth", "Height"]]
@@ -326,8 +325,6 @@ def _figure_06(train_numeric: Any) -> tuple[Figure, list[Axes]]:
     gs = GridSpec(n_vars, n_vars, figure=fig)
     axes = []
 
-    # Create a color cycle
-    # colors = plt.cm.tab10.colors  # This gives 10 distinct colors
     colors = mpl.color_sequences["tab10"]
     color_idx = 0
 
@@ -348,7 +345,7 @@ def _figure_06(train_numeric: Any) -> tuple[Figure, list[Axes]]:
                     train_numeric.iloc[:, i],
                     ax=ax,
                     kde=True,
-                    color=colors[i % len(colors)],  # Use color cycle for histograms too
+                    color=colors[i % len(colors)],
                 )
                 ax.set_ylabel("")
             else:
@@ -358,9 +355,9 @@ def _figure_06(train_numeric: Any) -> tuple[Figure, list[Axes]]:
                     alpha=0.6,
                     s=15,
                     edgecolor="none",
-                    color=colors[color_idx % len(colors)],  # Use color from cycle
+                    color=colors[color_idx % len(colors)],
                 )
-                color_idx += 1  # Move to next color
+                color_idx += 1
     axes[0].set_ylabel("Peso (kg)")
 
     return fig, axes
@@ -657,37 +654,42 @@ def figure_11():
     return fig, ax
 
 
-figs = {
-    "figure_01": figure_01,
-    "figure_02": figure_02,
-    "figure_03": figure_03,
-    "figure_04": figure_04,
-    "figure_05": figure_05,
-    "figure_06": figure_06,
-    "figure_07": figure_07,
-    "figure_08": figure_08,
-    "figure_09": figure_09,
-    "figure_10": figure_10,
-    "figure_11": figure_11,
-}
+def main():
+    figs = {
+        "figure_01": figure_01,
+        "figure_02": figure_02,
+        "figure_03": figure_03,
+        "figure_04": figure_04,
+        "figure_05": figure_05,
+        "figure_06": figure_06,
+        "figure_07": figure_07,
+        "figure_08": figure_08,
+        "figure_09": figure_09,
+        "figure_10": figure_10,
+        "figure_11": figure_11,
+    }
 
-figs_dirpath = Path(".").resolve() / "eda_donkeys_figures_2"
-figs_dirpath.mkdir(exist_ok=True)
-fl = list(figs.keys())
+    figs_dirpath = Path(__file__).parent / "eda_donkeys_figures"
+    figs_dirpath.mkdir(exist_ok=True)
+    fl = list(figs.keys())
 
-for i, func_name in enumerate(fl):
-    fig, _ = figs[func_name]()
-    fig.suptitle(
-        f"Modelo de predicción de peso\nGráfica {func_name.split("_")[1]} de 11"
-    )
-    print(f"Generando gráfica {func_name}")
+    for i, func_name in enumerate(fl):
+        fig, _ = figs[func_name]()
+        fig.suptitle(
+            f"Modelo de predicción de peso\nGráfica {func_name.split("_")[1]} de 11"
+        )
+        print(f"Generando gráfica {func_name}")
 
-    # plt.show()
+        # plt.show()
 
-    save_path = figs_dirpath.name + "/" + func_name + ".png"
-    fig.savefig(save_path, dpi=300)
-    plt.close()
-    print(f"\nSe guardó la imagen {func_name}.\n", end="\u2a69" * (1 + i) + "\n")
-    print(f"Quedan {len(fl)- 1 - i}")
+        save_path = figs_dirpath / f"{func_name}.png"
+        fig.savefig(save_path, dpi=300, format="png")
+        plt.close()
+        print(f"\nSe guardó la imagen {func_name}.\n", end="\u2a69" * (1 + i) + "\n")
+        print(f"Quedan {len(fl)- 1 - i}")
 
-print("Se guardaron todas las imágenes.")
+    print("Se guardaron todas las imágenes.")
+
+
+if __name__ == "__main__":
+    main()
